@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs", // commonjs => Require , es2015, esnext => import
+    "lib": ["es6", "DOM.Iterable", "dom", "ScriptHost", "ES2015", "ES2016", "ES2020"],
+    //"allowJs": true,
+    "esModuleInterop": true, // import 하나의 여러 모듈을 가져오는 문법 허용
+    //"skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true, //export 시 export default를 자동으로 설정
+    "noImplicitAny": true, // 표현식의 에러 검증
+    "moduleResolution": "node", // 모듈 해석 방식
+    "sourceMap": true,
+    "pretty": true, // error 메시지 예쁘게
+    "outDir": "dist",
+    //"rootDir": "src",
+    "baseUrl": ".", //paths옵션의 기준 디렉토리
+    "paths": {
+      "*": ["node_modules/*", "src/types/*"]
+    },
+    "types": ["node"],
+    "typeRoots": ["./@types", "./node_modules/@types"]
+  },
+  "include": ["src/**/*"]
+  //"exclude": ["node_modules"],
+}
