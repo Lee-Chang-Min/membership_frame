@@ -28,15 +28,19 @@ export const getLogin = (req: Request, res: Response): void => {
  * @route POST /login
  */
 export const postLogin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  await check("email", "Email is not valid").isEmail().run(req);
-  await check("password", "Password cannot be blank").isLength({ min: 1 }).run(req);
-  await body("email").normalizeEmail({ gmail_remove_dots: false }).run(req);
+  await body("email", "Email is not valid").isEmail().run(req);
+  await body("password")
+    .isLength({ min: 6, max: 20 })
+    .withMessage("비밀번호는 최소 6글자에서 최대 20글자 입니다.")
+    .matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,20}$/)
+    .withMessage("최소 1개의 영문자 및 숫자가 포함되어야 합니다.")
+    .run(req);
 
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
     req.flash("errors", errors.array());
-    return res.redirect("/login");
+    return res.redirect("/user/login");
   }
 
   passport.authenticate("local", (err: Error, user: UserDocument, info: IVerifyOptions) => {
@@ -87,7 +91,6 @@ export const postSignup = async (req: Request, res: Response, next: NextFunction
   await check("email", "Email is not valid").isEmail().run(req);
   await check("password", "Password must be at least 4 characters long").isLength({ min: 4 }).run(req);
   await check("confirmPassword", "Passwords do not match").equals(req.body.password).run(req);
-  await body("email").normalizeEmail({ gmail_remove_dots: false }).run(req);
 
   const errors = validationResult(req);
 
@@ -101,42 +104,36 @@ export const postSignup = async (req: Request, res: Response, next: NextFunction
     password: req.body.password,
   });
 
-  User.findOne({ email: req.body.email }, (err: MongooseError, existingUser: UserDocument) => {
-    if (err) {
-      return next(err);
-    }
-    if (existingUser) {
-      req.flash("errors", { msg: "Account with that email address already exists." });
-      return res.redirect("/signup");
-    }
-    // user
-    //   .save()
-    //   .then(() => {
-    //     req.logIn(user, (err) => {
-    //       if (err) {
-    //         return next(err);
-    //       }
-    //       res.redirect("/");
-    //     });
-    //   })
-    //   .catch((err) => {
-    //     if (err) {
-    //       return next(err);
-    //     }
-    //   });
+  User.findOne({ email: req.body.email })
+    .then((docs) => {
+      console.log("docs", docs);
 
-    //   user.save((err: MongooseError) => {
-    //     if (err) {
-    //       return next(err);
-    //     }
-    //     req.logIn(user, (err) => {
-    //       if (err) {
-    //         return next(err);
-    //       }
-    //       res.redirect("/");
-    //     });
-    //   });
-  });
+      if (docs) {
+        req.flash("errors", { msg: "Account with that email address already exists." });
+        return res.redirect("/signup");
+      }
+
+      user
+        .save()
+        .then(() => {
+          req.logIn(docs, (err) => {
+            if (err) {
+              return next(err);
+            }
+            res.redirect("/");
+          });
+        })
+        .catch((err) => {
+          if (err) {
+            return next(err);
+          }
+        });
+    })
+    .catch((err) => {
+      console.log("err", err);
+      return next(err);
+    });
+  //User.findOne({ email: req.body.email }, (err: MongooseError, existingUser: UserDocument) => {});
 };
 
 /**

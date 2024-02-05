@@ -9,14 +9,21 @@ import { Request, Response, NextFunction } from "express";
 import { MongooseError } from "mongoose";
 
 const LocalStrategy = passportLocal.Strategy;
-const FacebookStrategy = passportFacebook.Strategy;
+//const FacebookStrategy = passportFacebook.Strategy;
 
 passport.serializeUser<any, any>((req, user, done) => {
+  console.log("serializeUser", user);
   done(undefined, user);
 });
 
-passport.deserializeUser((id, done) => {
-  User.findById(id, (err: MongooseError, user: UserDocument) => done(err, user));
+passport.deserializeUser((id: string, done) => {
+  console.log("deserializeUser", id);
+  User.findById(id)
+    .then((user) => {
+      done(undefined, user);
+    })
+    .catch((err) => done(err));
+  //User.findById(id, (err: MongooseError, user: UserDocument) => done(err, user));
 });
 
 /**
@@ -25,28 +32,32 @@ passport.deserializeUser((id, done) => {
 passport.use(
   new LocalStrategy({ usernameField: "email" }, (email, password, done) => {
     console.log("LocalStrategy", email, password);
+    User.findOne({ email: email.toLowerCase() })
+      .then((user: UserDocument) => {
+        if (!user) {
+          return done(undefined, false, {
+            message: `Email ${email} not found.`,
+          });
+        }
 
-    User.findOne({ email: email.toLowerCase() }, (err: MongooseError, user: UserDocument) => {
-      if (err) {
+        //user가 있을때 현재 입력된 password와 db 적재된 암호화된 password와 비교
+        user.comparePassword(password, (err: Error, isMatch: boolean) => {
+          if (err) {
+            return done(err);
+          }
+          //로그인 성공 했을 때.
+          if (isMatch) {
+            return done(undefined, user);
+          }
+          //비밀번호가 틀렸을 때.
+          return done(undefined, false, {
+            message: "Invalid email or password.",
+          });
+        });
+      })
+      .catch((err) => {
         return done(err);
-      }
-      if (!user) {
-        return done(undefined, false, {
-          message: `Email ${email} not found.`,
-        });
-      }
-      user.comparePassword(password, (err: Error, isMatch: boolean) => {
-        if (err) {
-          return done(err);
-        }
-        if (isMatch) {
-          return done(undefined, user);
-        }
-        return done(undefined, false, {
-          message: "Invalid email or password.",
-        });
       });
-    });
   }),
 );
 
