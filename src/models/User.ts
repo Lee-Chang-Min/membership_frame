@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt-nodejs";
+import bcrypt from "bcrypt";
 import crypto from "crypto";
 import mongoose from "mongoose";
 
