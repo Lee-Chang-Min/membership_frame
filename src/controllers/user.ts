@@ -9,6 +9,7 @@ import { WriteError } from "mongodb";
 import { body, check, validationResult } from "express-validator";
 import "../config/passport";
 import { CallbackError, MongooseError } from "mongoose";
+import { log } from "console";
 
 /**
  * Login page.
@@ -65,9 +66,13 @@ export const postLogin = async (req: Request, res: Response, next: NextFunction)
  * Log out.
  * @route GET /logout
  */
-export const logout = (req: Request, res: Response): void => {
-  req.logout();
-  res.redirect("/");
+export const logout = (req: Request, res: Response, next: NextFunction): void => {
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    res.redirect("/");
+  });
 };
 
 /**
@@ -116,12 +121,7 @@ export const postSignup = async (req: Request, res: Response, next: NextFunction
       user
         .save()
         .then(() => {
-          req.logIn(docs, (err) => {
-            if (err) {
-              return next(err);
-            }
-            res.redirect("/");
-          });
+          res.redirect("/user/completeSignup");
         })
         .catch((err) => {
           if (err) {
@@ -134,6 +134,16 @@ export const postSignup = async (req: Request, res: Response, next: NextFunction
       return next(err);
     });
   //User.findOne({ email: req.body.email }, (err: MongooseError, existingUser: UserDocument) => {});
+};
+
+/**
+ * Signup Success page.
+ * @route GET /successSignup
+ */
+export const completeSignup = (req: Request, res: Response): void => {
+  res.render("account/completeSignup", {
+    title: "completeSignup",
+  });
 };
 
 /**

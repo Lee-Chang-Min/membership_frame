@@ -1,0 +1,16 @@
+extends ../layout
+
+block content
+  .container
+    .row.justify-content-center
+      .col-md-8
+        .page-header.text-center
+          h3 회원가입 성공🥰
+          hr
+        .success-message.text-center
+          p 회원가입에 성공하였습니다. 로그인을 해주세요.
+        form.form-horizontal(id='login-form', method='GET', action='/user/login')
+          .text-center
+            button.btn.btn-primary(type='submit')
+              i.fa.fa-sign-in
+              | 로그인

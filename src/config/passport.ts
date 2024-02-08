@@ -1,6 +1,6 @@
 import passport from "passport";
 import passportLocal from "passport-local";
-import passportFacebook from "passport-facebook";
+//import passportFacebook from "passport-facebook";
 import { find } from "lodash";
 
 // import { User, UserType } from '../models/User';
@@ -11,11 +11,13 @@ import { MongooseError } from "mongoose";
 const LocalStrategy = passportLocal.Strategy;
 //const FacebookStrategy = passportFacebook.Strategy;
 
+//serializeUser: 로그인을 성공하였을때 딱 한번 호출되어 사용자 식별자를 Session storage에 저장된다.
 passport.serializeUser<any, any>((req, user, done) => {
   console.log("serializeUser", user);
   done(undefined, user);
 });
 
+//deserializeUser: 저장된 세션 데이터를 기준으로 필요한 정보를 조회할때 사용된다.
 passport.deserializeUser((id: string, done) => {
   console.log("deserializeUser", id);
   User.findById(id)
@@ -23,7 +25,6 @@ passport.deserializeUser((id: string, done) => {
       done(undefined, user);
     })
     .catch((err) => done(err));
-  //User.findById(id, (err: MongooseError, user: UserDocument) => done(err, user));
 });
 
 /**

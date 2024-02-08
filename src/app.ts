@@ -30,7 +30,7 @@ const mongoUrl = MONGODB_URI;
 
 mongoose
   .connect(mongoUrl, {
-    //dbName: "",
+    dbName: "dev",
   })
   .then(() => {
     if (process.env.NODE_ENV !== "production") {
@@ -53,11 +53,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
-    secret: SESSION_SECRET, //암호화하는데 쓰일 키
-    resave: false, // 세션을 언제나 저장할지 설정함
-    saveUninitialized: true, // 세션에 저장할 내역이 없더라도 처음부터 세션을 생성할지 설정
+    secret: SESSION_SECRET, //암호화하는데 쓰일 키.
+    resave: false, // 세션을 언제나 저장할지 설정함.
+    saveUninitialized: true, // 세션에 저장할 내역이 없더라도 처음부터 세션을 생성할지 설정.
     store: new MongoStore({
       mongoUrl,
+      dbName: "dev",
     }),
     cookie: { maxAge: 3.6e6 * 24 }, // 24시간 뒤 만료(자동 삭제)
   }),
@@ -96,15 +97,11 @@ app.use(express.static(path.join(__dirname, "public"), { maxAge: 31557600000 }))
 
 app.get("/", homeController.index);
 app.use("/user", UserRouter);
-// app.get("/login", userController.getLogin);
-// app.post("/login", userController.postLogin);
-// app.get("/logout", userController.logout);
+
 app.get("/forgot", userController.getForgot);
 app.post("/forgot", userController.postForgot);
 app.get("/reset/:token", userController.getReset);
 app.post("/reset/:token", userController.postReset);
-app.get("/signup", userController.getSignup);
-app.post("/signup", userController.postSignup);
 app.get("/contact", contactController.getContact);
 app.post("/contact", contactController.postContact);
 app.get("/account", passportConfig.isAuthenticated, userController.getAccount);
