@@ -7,144 +7,138 @@ import { Request, Response, NextFunction } from "express";
 import { IVerifyOptions } from "passport-local";
 import { WriteError } from "mongodb";
 import { body, check, validationResult } from "express-validator";
-import "../config/passport";
 import { CallbackError, MongooseError } from "mongoose";
 import { log } from "console";
+import UserService from "../services/userService";
+import "../config/passport";
 
-/**
- * Login page.
- * @route GET /login
- */
-export const getLogin = (req: Request, res: Response): void => {
-  if (req.user) {
-    return res.redirect("/");
+export default class UserController {
+  userService: UserService;
+  constructor() {
+    this.userService = new UserService();
   }
-  res.render("account/login", {
-    title: "Login",
-  });
-};
+  test = (req: Request, res: Response): void => {
+    const email = req.body.email;
+    this.userService.findUser(email);
+    res.send("success");
+  };
 
-/**
- * Sign in using email and password.
- * @route POST /login
- */
-export const postLogin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  await body("email", "Email is not valid").isEmail().run(req);
-  await body("password")
-    .isLength({ min: 6, max: 20 })
-    .withMessage("비밀번호는 최소 6글자에서 최대 20글자 입니다.")
-    .matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,20}$/)
-    .withMessage("최소 1개의 영문자 및 숫자가 포함되어야 합니다.")
-    .run(req);
-
-  const errors = validationResult(req);
-
-  if (!errors.isEmpty()) {
-    req.flash("errors", errors.array());
-    return res.redirect("/user/login");
-  }
-
-  passport.authenticate("local", (err: Error, user: UserDocument, info: IVerifyOptions) => {
-    if (err) {
-      return next(err);
+  /**
+   * Login page.
+   * @route GET /login
+   */
+  getLogin = (req: Request, res: Response): void => {
+    if (req.user) {
+      return res.redirect("/");
     }
-    if (!user) {
-      req.flash("errors", { msg: info.message });
-      return res.redirect("/login");
+    res.render("account/login", { title: "Login" });
+  };
+
+  /**
+   * Sign in using email and password.
+   * @route POST /login
+   */
+  postLogin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    await body("email", "Email is not valid").isEmail().run(req);
+    await body("password")
+      .isLength({ min: 6, max: 20 })
+      .withMessage("비밀번호는 최소 6글자에서 최대 20글자 입니다.")
+      .matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,20}$/)
+      .withMessage("최소 1개의 영문자 및 숫자가 포함되어야 합니다.")
+      .run(req);
+
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      req.flash("errors", errors.array());
+      return res.redirect("/user/login");
     }
-    req.logIn(user, (err) => {
+
+    passport.authenticate("local", (err: Error, user: UserDocument, info: IVerifyOptions) => {
       if (err) {
         return next(err);
       }
-      req.flash("success", { msg: "Success! You are logged in." });
-      res.redirect(req.session.returnTo || "/");
+      if (!user) {
+        req.flash("errors", { msg: info.message });
+        return res.redirect("/login");
+      }
+      req.logIn(user, (err) => {
+        if (err) {
+          return next(err);
+        }
+        req.flash("success", { msg: "Success! You are logged in." });
+        res.redirect(req.session.returnTo || "/");
+      });
+    })(req, res, next);
+  };
+
+  /**
+   * Log out.
+   * @route GET /logout
+   */
+  logout = (req: Request, res: Response, next: NextFunction): void => {
+    req.logout((err) => {
+      if (err) {
+        return next(err);
+      }
+      res.redirect("/");
     });
-  })(req, res, next);
-};
+  };
 
-/**
- * Log out.
- * @route GET /logout
- */
-export const logout = (req: Request, res: Response, next: NextFunction): void => {
-  req.logout((err) => {
-    if (err) {
-      return next(err);
+  /**
+   * Signup page.
+   * @route GET /signup
+   */
+  getSignup = (req: Request, res: Response): void => {
+    if (req.user) {
+      return res.redirect("/");
     }
-    res.redirect("/");
-  });
-};
+    res.render("account/signup", {
+      title: "Create Account",
+    });
+  };
 
-/**
- * Signup page.
- * @route GET /signup
- */
-export const getSignup = (req: Request, res: Response): void => {
-  if (req.user) {
-    return res.redirect("/");
-  }
-  res.render("account/signup", {
-    title: "Create Account",
-  });
-};
+  /**
+   * Create a new local account.
+   * @route POST /signup
+   */
+  postSignup = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    await check("email", "Email is not valid").isEmail().run(req);
+    await check("password", "Password must be at least 4 characters long").isLength({ min: 4 }).run(req);
+    await check("confirmPassword", "Passwords do not match").equals(req.body.password).run(req);
 
-/**
- * Create a new local account.
- * @route POST /signup
- */
-export const postSignup = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  await check("email", "Email is not valid").isEmail().run(req);
-  await check("password", "Password must be at least 4 characters long").isLength({ min: 4 }).run(req);
-  await check("confirmPassword", "Passwords do not match").equals(req.body.password).run(req);
+    const errors = validationResult(req);
 
-  const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      req.flash("errors", errors.array());
+      return res.redirect("/signup");
+    }
 
-  if (!errors.isEmpty()) {
-    req.flash("errors", errors.array());
-    return res.redirect("/signup");
-  }
-
-  const user = new User({
-    email: req.body.email,
-    password: req.body.password,
-  });
-
-  User.findOne({ email: req.body.email })
-    .then((docs) => {
-      console.log("docs", docs);
-
-      if (docs) {
+    try {
+      const existingUser = await this.userService.findUser(req.body.email);
+      if (existingUser) {
         req.flash("errors", { msg: "Account with that email address already exists." });
         return res.redirect("/signup");
       }
 
-      user
-        .save()
-        .then(() => {
-          res.redirect("/user/completeSignup");
-        })
-        .catch((err) => {
-          if (err) {
-            return next(err);
-          }
-        });
-    })
-    .catch((err) => {
-      console.log("err", err);
-      return next(err);
-    });
-  //User.findOne({ email: req.body.email }, (err: MongooseError, existingUser: UserDocument) => {});
-};
+      await this.userService.createUser(req.body.email, req.body.password);
+      res.redirect("/user/completeSignup");
+    } catch (error) {
+      console.log("error>", error);
+      next(error);
+    }
+  };
 
-/**
- * Signup Success page.
- * @route GET /successSignup
- */
-export const completeSignup = (req: Request, res: Response): void => {
-  res.render("account/completeSignup", {
-    title: "completeSignup",
-  });
-};
+  /**
+   * Signup Success page.
+   * @route GET /successSignup
+   */
+  completeSignup = (req: Request, res: Response): void => {
+    res.render("account/completeSignup", {
+      title: "completeSignup",
+    });
+  };
+}
 
 /**
  * Profile page.
