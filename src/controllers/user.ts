@@ -60,7 +60,7 @@ export default class UserController {
       }
       if (!user) {
         req.flash("errors", { msg: info.message });
-        return res.redirect("/login");
+        return res.redirect("/user/login");
       }
       req.logIn(user, (err) => {
         if (err) {

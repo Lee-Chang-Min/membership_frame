@@ -8,7 +8,7 @@ import mongoose from "mongoose";
 import passport from "passport";
 import helmet from "helmet";
 
-import UserRouter from "./routers/userRoute";
+import UserRoute from "./routers/userRoute";
 import TestRoute from "./routers/testRoute";
 
 import { MONGODB_URI, SESSION_SECRET } from "./util/secrets";
@@ -25,6 +25,7 @@ import * as passportConfig from "./config/passport";
 // Create Express server
 const app = express();
 const testRoute = new TestRoute();
+const userRoute = new UserRoute();
 
 // Connect to MongoDB
 const mongoUrl = MONGODB_URI;
@@ -98,7 +99,7 @@ app.use(express.static(path.join(__dirname, "public"), { maxAge: 31557600000 }))
  */
 
 app.get("/", homeController.index);
-app.use("/user", UserRouter);
+app.use("/user", userRoute.router);
 app.use("/ttt", testRoute.router);
 
 app.get("/forgot", userController.getForgot);
@@ -136,12 +137,12 @@ app.get(
   },
 );
 
-app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error("app.use: Error 미들웨어", error.stack);
-  res.status(500).send({
-    name: error.name || "Internal Server Error",
-    message: error.message || "서버 내부에서 오류가 발생했습니다.",
-  });
-});
+// app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+//   console.error("app.use: Error 미들웨어", error.stack);
+//   res.status(500).send({
+//     name: error.name || "Internal Server Error",
+//     message: error.message || "서버 내부에서 오류가 발생했습니다.",
+//   });
+// });
 
 export default app;
