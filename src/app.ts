@@ -7,10 +7,12 @@ import path from "path";
 import mongoose from "mongoose";
 import passport from "passport";
 import helmet from "helmet";
+import swaggerUi from "swagger-ui-express";
 
 import UserRoute from "./routers/userRoute";
 import TestRoute from "./routers/testRoute";
 
+//secrets keys require
 import { MONGODB_URI, SESSION_SECRET } from "./util/secrets";
 
 // Controllers (route handlers)
@@ -21,6 +23,9 @@ import * as contactController from "./controllers/contact";
 
 // API keys and Passport configuration
 import * as passportConfig from "./config/passport";
+
+// swagger setting json
+import swaggerDocument from "../docs/swagger";
 
 // Create Express server
 const app = express();
@@ -96,7 +101,8 @@ app.use(express.static(path.join(__dirname, "public"), { maxAge: 31557600000 }))
 
 /**
  * Primary app routes.
- */
+*/
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explorer: true }));
 
 app.get("/", homeController.index);
 app.use("/user", userRoute.router);

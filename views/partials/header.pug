@@ -18,16 +18,16 @@ nav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
       ul.nav.navbar-nav
         if !user
           li.nav-item(class=(title === 'Login') ? 'active' : undefined)
-            a.nav-link(href='/user/login') Login
+            a.nav-link(href='/user/login') 로그인
           li.nav-item(class=(title === 'Create Account') ? 'active' : undefined)
-            a.nav-link(href='/user/signup') Create Account
+            a.nav-link(href='/user/signup') 회원가입
         else
           li.nav-item.dropdown(class=(title === 'Account Management') ? 'active' : undefined)
             a.nav-link.dropdown-toggle(href='#', data-toggle='dropdown')
               if user.profile.picture
-                img(src=user.profile.picture, alt=(user.profile.name || user.email || user.id))
+                img(src=user.profile.picture)
               else
-                img(src=user.gravatar(60), alt=(user.profile.name || user.email || user.id))
+                img(src=user.gravatar(60))
               span= user.profile.name || user.email || user.id
               i.caret
             ul.dropdown-menu

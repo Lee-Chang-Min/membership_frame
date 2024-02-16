@@ -1,31 +1,164 @@
 extends ../layout
 
 block content
-  .page-header
-    h3 Sign in
-    hr
+  style.
+    .header-container {
+      display: flex;
+      align-items: center; /* 세로 중앙 정렬 */
+      justify-content: center; /* 가로 중앙 정렬 */
+    }
+    .header-container h3 {
+      font-family: "Dongle", sans-serif;
+      margin-left: 10px; /* 텍스트와 이미지 사이 간격 */
+      margin-top: 18px;
+    }
 
-  form.form-horizontal(method='POST')
-    input(type='hidden', name='_csrf', value=_csrf)
-    .form-group.row
-      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='email') 이메일
-      .col-sm-7
-        input.form-control(type='email', name='email', id='email', placeholder='이메일을 입력해주세요.', autofocus, required)
-    .form-group.row
-      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='password') 비밀번호
-      .col-sm-7
-        input.form-control(type='password', name='password', id='password', placeholder='영문, 숫자가 포함 6~20자 를 입력해주세요.', required)
-    .form-group.row
-      .offset-sm-3.col-sm-7
-        button.col-sm-3.btn.btn-primary(type='submit')
-          i.fa.fa-user
-          | Login
-        a.btn.btn-link(href='/forgot') Forgot your password?
-    .form-group.row
-      .offset-sm-3.col-sm-7
-        hr
-    .form-group.row
-      .offset-sm-3.col-sm-7
-        a.btn.btn-block.btn-facebook.btn-social(href='/auth/facebook')
-          i.fa.fa-facebook
-          | Sign in with Facebook
+  .container 
+    .row.justify-content-center  
+      .col-lg-4  
+        .page-header.text-center
+          .header-container
+            img(src="/images/a2c.jpg", alt="Climbing", style="width: 50px; height: 50px;")
+            h3 All About Climbing
+          hr
+        form.form-horizontal(method='POST')
+          input(type='hidden', name='_csrf', value=_csrf)
+          .form-group(style='margin-bottom: 8px;') 
+            //label.col-form-label.text-right.font-weight-bold(for='email') 이메일
+            input.form-control(type='email', name='email', id='email', placeholder='이메일', autofocus, required)
+          .form-group(style='margin-bottom: 8px;') 
+            //label.col-form-label.text-right.font-weight-bold(for='password') 비밀번호
+            input.form-control(type='password', name='password', id='password', placeholder='비밀번호', required)
+          .form-group.text-center
+            button.btn.btn-primary(type='submit', style='width: 100%;')
+              i.fa.fa-user
+              | Login
+          .form-group.text-center  
+            a.btn.btn-link(href='/forgot', style='margin-right: 10px;') 비밀번호 재설정
+            |  
+            a.btn.btn-link(href='/user/signup') 회원가입
+
+
+        
+    //- .form-group.row
+    //-   .offset-sm-3.col-sm-7
+    //-     hr
+    //- .form-group.row
+    //-   .offset-sm-3.col-sm-7
+    //-     a.btn.btn-block.btn-facebook.btn-social(href='/auth/facebook')
+    //-       i.fa.fa-facebook
+    //-       | Sign in with Facebook
+
+
+
+//- style.
+//-       body {
+//-         font-family: 'Noto Sans KR', sans-serif;
+//-         background-color: #f3f4f6;
+//-         display: flex;
+//-         align-items: center;
+//-         justify-content: center;
+//-         height: 100vh;
+//-       }
+//-       .container {
+//-         display: flex;
+//-         flex-direction: column;
+//-         align-items: center;
+//-         justify-content: center;
+//-         height: 100%;
+//-         width: 100%;
+//-         max-width: 100%;
+//-         padding: 32px;
+//-         background-color: #ffffff;
+//-         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+//-         border-radius: 0.5rem;
+//-       }
+//-       .form-group {
+//-         margin-bottom: 1rem;
+//-       }
+//-       input {
+//-         width: 100%;
+//-         padding: 0.5rem 0.75rem;
+//-         border: 1px solid #d1d5db;
+//-         border-radius: 0.25rem;
+//-         margin-top: 0.5rem;
+//-       }
+//-       button {
+//-         display: flex;
+//-         justify-content: center;
+//-         width: 100%;
+//-         padding: 0.5rem 0.75rem;
+//-         border: none;
+//-         border-radius: 0.375rem;
+//-         color: #ffffff;
+//-         background-color: #2563eb;
+//-         font-size: 0.875rem;
+//-         font-weight: 500;
+//-         margin-top: 1.5rem;
+//-       }
+//-       button:hover {
+//-         background-color: #1d4ed8;
+//-       }
+//-       .links a {
+//-         color: #2563eb;
+//-         text-decoration: none;
+//-         font-size: 0.875rem;
+//-         margin-top: 0.5rem;
+//-       }
+//-       .links a:hover {
+//-         color: #1d4ed8;
+//-       }
+//-       img {
+//-         margin-bottom: 1rem;
+//-       }
+//-       h2 {
+//-         font-size: 1.5rem;
+//-         font-weight: 700;
+//-         margin-bottom: 1.5rem;
+//-       }
+
+//- body
+//-   .container(style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; width: 100%;")
+//-     img(src="https://placehold.co/100x100", alt="로고 이미지", style="margin-bottom: 16px;")
+//-     h2(style="font-size: 24px; font-weight: bold; margin-bottom: 24px;") 오늘의집
+//-     form(style="width: 100%; max-width: 320px;")
+//-       .form-group(style="margin-bottom: 16px;")
+//-         label(for="email", class="sr-only") 이메일
+//-         input#email(name="email", type="email", required, style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; margin-top: 8px;", placeholder="이메일을 입력해주세요.")
+//-       .form-group(style="margin-bottom: 16px;")
+//-         label(for="password", class="sr-only") 비밀번호
+//-         input#password(name="password", type="password", required, style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; margin-top: 8px;", placeholder="영문, 숫자가 포함 6~20자를 입력해주세요.")
+//-       .form-group(style="margin-bottom: 24px;")
+//-         button(type="submit", style="width: 100%; display: flex; justify-content: center; padding: 8px 12px; border: none; border-radius: 6px; color: white; background-color: #2563eb;") 로그인
+//-     .links(style="display: flex; flex-direction: column; align-items: center; gap: 8px;")
+//-       a(href="#", style="color: #2563eb; text-decoration: none; font-size: 14px; margin-top: 8px;") 비밀번호 찾기
+//-       a(href="#", style="color: #2563eb; text-decoration: none; font-size: 14px; margin-top: 8px;") 회원가입
+
+
+
+
+  //- form.form-horizontal(method='POST')
+  //-   input(type='hidden', name='_csrf', value=_csrf)
+  //-   .form-group.row
+  //-     label.col-sm-3.col-form-label.text-right.font-weight-bold(for='email') 이메일
+  //-     .col-sm-7
+  //-       input.form-control(type='email', name='email', id='email', placeholder='이메일', autofocus, required)
+  //-   .form-group.row
+  //-     label.col-sm-3.col-form-label.text-right.font-weight-bold(for='password') 비밀번호
+  //-     .col-sm-7
+  //-       input.form-control(type='password', name='password', id='password', placeholder='비밀번호', required)
+  //-   .form-group.row
+  //-     .offset-sm-3.col-sm-7
+  //-       button.col-sm-3.btn.btn-primary(type='submit')
+  //-         i.fa.fa-user
+  //-         | Login
+  //-       a.btn.btn-link(href='/forgot') Forgot your password?
+  //-   .form-group.row
+  //-     .offset-sm-3.col-sm-7
+  //-       hr
+    //- .form-group.row
+    //-   .offset-sm-3.col-sm-7
+    //-     a.btn.btn-block.btn-facebook.btn-social(href='/auth/facebook')
+    //-       i.fa.fa-facebook
+    //-       | Sign in with Facebook
+

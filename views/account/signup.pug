@@ -2,24 +2,44 @@ extends ../layout
 
 block content
   .page-header
-    h3 Sign up
+    h3 All About Climbing
     hr
   form.form-horizontal(id='signup-form', method='POST')
     input(type='hidden', name='_csrf', value=_csrf)
+    // 이메일 입력란
     .form-group.row.justify-content-md-center
-      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='email') Email
-      .col-sm-7
+      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='email') 이메일
+      .col-sm-4
         input.form-control(type='email', name='email', id='email', placeholder='Email', autofocus, required)
+    // 이메일 인증 버튼
     .form-group.row.justify-content-md-center
-      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='password') Password
-      .col-sm-7
+      .col-sm-4.offset-sm-3
+        button.btn.btn-info(type='button', style='width: 100%;') 이메일 인증하기
+    // 비밀번호 입력란
+    .form-group.row.justify-content-md-center
+      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='password') 비밀번호
+      .col-sm-4
         input.form-control(type='password', name='password', id='password', placeholder='Password', required)
+    // 비밀번호 확인 입력란
     .form-group.row.justify-content-md-center
-      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='confirmPassword') Confirm Password
-      .col-sm-7
+      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='confirmPassword') 비밀번호 확인
+      .col-sm-4
         input.form-control(type='password', name='confirmPassword', id='confirmPassword', placeholder='Confirm Password', required)
+    // 닉네임 입력란
     .form-group.row.justify-content-md-center
-      .offset-sm-3.col-sm-7
-        button.btn.btn-success(type='submit')
+      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='nickname') 닉네임
+      .col-sm-4
+        input.form-control(type='text', name='nickname', id='nickname', placeholder='Nickname', required)
+    // 약관동의 체크박스
+    .form-group.row.justify-content-md-center
+      .col-sm-4.offset-sm-3
+        .checkbox
+          label
+            input(type='checkbox', name='terms', required)
+            |  약관에 동의합니다.
+    // 회원가입 버튼
+    .form-group.row.justify-content-md-center
+      .col-sm-4.offset-sm-3
+        button.btn.btn-success(type='submit', style='width: 100%;')
           i.fa.fa-user-plus
-          | Signup
+          | 회원가입하기

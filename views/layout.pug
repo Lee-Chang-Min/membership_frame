@@ -4,10 +4,22 @@ html(lang='')
     meta(charset='utf-8')
     meta(http-equiv='X-UA-Compatible', content='IE=edge')
     meta(name='viewport', content='width=device-width, initial-scale=1.0')
-    title #{title} - Hackathon Starter
+    title #{title} - All About Climbing
     meta(name='description', content='')
     meta(name='theme-color' content='#4DA5F4')
     link(rel='stylesheet', href='/css/main.css')
+    link(rel="preconnect" href="https://fonts.googleapis.com")
+    link(rel="preconnect" href="https://fonts.gstatic.com" crossorigin)
+    link(href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Dongle&family=Gamja+Flower&display=swap" rel="stylesheet")
+    style.
+      html {
+        font-size: 20px; /* 기본 font-size를 10px로 설정 */
+      }
+      h3, h2, h1, body, button, input, textarea, a {
+        font-family: "Dongle", sans-serif;
+        font-weight: 400;
+        font-style: normal;
+      }
 
   body
     include partials/header
@@ -22,8 +34,7 @@ html(lang='')
     script(src='/js/lib/bootstrap.min.js')
     script(async defer src="https://buttons.github.io/buttons.js")
     script(src='/js/main.js')
-
-    //- Google Analytics: change UA-38177297-2 to be your site's ID
+    //- Google Analytics: change UA-38177297-2 to be your site's ID.
     script.
       window.ga=function(){ga.q.push(arguments)};ga.q=[];ga.l=+new Date;
       ga('create','UA-38177297-2','auto');ga('send','pageview')

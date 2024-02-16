@@ -16,14 +16,23 @@ html {
 body {
   padding-top: 80px;
   margin-bottom: 75px;
+  font-family: 'Gamja Flower', cursive;
 }
+
+.gamja-flower-regular {
+  font-family: "Gamja Flower", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
 
 footer {
   position: absolute;
   bottom: 0;
   width: 100%;
 
-  p, ul {
+  p,
+  ul {
     margin-bottom: 0;
   }
 }
@@ -62,6 +71,7 @@ textarea {
 
 // Font Icons
 // -------------------------
+
 
 .fa {
   margin-right: 6px;
