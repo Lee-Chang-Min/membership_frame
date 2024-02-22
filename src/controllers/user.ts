@@ -10,12 +10,17 @@ import { body, check, validationResult } from "express-validator";
 import { CallbackError, MongooseError } from "mongoose";
 import { log } from "console";
 import UserService from "../services/userService";
+import EmailService from "../util/sendEmail";
 import "../config/passport";
 
 export default class UserController {
   userService: UserService;
+  emailService: EmailService;
+
+  //생성자
   constructor() {
     this.userService = new UserService();
+    this.emailService = new EmailService();
   }
   test = (req: Request, res: Response): void => {
     const email = req.body.email;
@@ -138,6 +143,25 @@ export default class UserController {
       title: "completeSignup",
     });
   };
+
+
+  verifyEmail = () => {
+    console.log("1단계");
+    console.log("2단계");
+
+    //1. email 과 6자리 인증번호를 만드는 함수 필요함
+    const To_email = "cmlee@goldenplanet.co.kr";
+    const verificationCode = 123456;
+
+    //인증 번호를 만들었으면 DB에 저장해야하는 부분 (단 유효기간 3분 프로시저)
+    //model 만들고 service insert 하는 부분 service 로 빼야함
+
+    //이메일 발송 
+    this.emailService.sendVerificationEmail(To_email, verificationCode);
+
+  };
+
+
 }
 
 /**

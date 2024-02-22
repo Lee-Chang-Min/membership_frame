@@ -22,7 +22,7 @@
     "sourceMap": true,
     "pretty": true, // error 메시지 예쁘게
     "outDir": "dist",
-    //"rootDir": "src",
+    "rootDir": "src",
     "baseUrl": ".", //paths옵션의 기준 디렉토리
     "paths": {
       "*": [
@@ -39,8 +39,7 @@
     ]
   },
   "include": [
-    "src/**/*",
-    "docs"
+    "src/**/*"
   ]
   //"exclude": ["node_modules"],
 }

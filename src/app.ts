@@ -25,7 +25,7 @@ import * as contactController from "./controllers/contact";
 import * as passportConfig from "./config/passport";
 
 // swagger setting json
-import swaggerDocument from "../docs/swagger";
+import swaggerDocument from "./docs/swagger";
 
 // Create Express server
 const app = express();

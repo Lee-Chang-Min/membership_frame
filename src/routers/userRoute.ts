@@ -99,6 +99,8 @@ export default class userRoute {
 
     this.router.post("/signup", this.controller.postSignup);
 
+    this.router.post("/verifyEmail", this.controller.verifyEmail);
+
     this.router.get("/completeSignup", this.controller.completeSignup);
   }
 }
