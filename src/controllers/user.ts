@@ -8,10 +8,11 @@ import { IVerifyOptions } from "passport-local";
 import { WriteError } from "mongodb";
 import { body, check, validationResult } from "express-validator";
 import { CallbackError, MongooseError } from "mongoose";
-import { log } from "console";
+import moment_tz from "moment-timezone";
 import UserService from "../services/userService";
 import EmailService from "../util/sendEmail";
 import "../config/passport";
+import { log } from "console";
 
 export default class UserController {
   userService: UserService;
@@ -144,24 +145,45 @@ export default class UserController {
     });
   };
 
+  verifySend = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const email = req.body.email;
 
-  verifyEmail = () => {
-    console.log("1단계");
-    console.log("2단계");
+      // 숫자를 문자열로 변환하고, 6자리 미만일 경우 앞을 0으로 채웁니다.
+      const verificationCode = String(Math.floor(Math.random() * 1000000)).padStart(6, "0");
+      const expiresAt = moment_tz().toDate();
 
-    //1. email 과 6자리 인증번호를 만드는 함수 필요함
-    const To_email = "cmlee@goldenplanet.co.kr";
-    const verificationCode = 123456;
+      //인증 번호를 만들었으면 DB에 저장 (단 유효기간 3분 TTL)
+      await this.userService.createEmailVerification(req.body.email, verificationCode, expiresAt);
 
-    //인증 번호를 만들었으면 DB에 저장해야하는 부분 (단 유효기간 3분 프로시저)
-    //model 만들고 service insert 하는 부분 service 로 빼야함
-
-    //이메일 발송 
-    this.emailService.sendVerificationEmail(To_email, verificationCode);
-
+      //이메일 발송
+      this.emailService.sendVerificationEmail(email, verificationCode);
+      res.json({ result: "success" });
+    } catch (err) {
+      res.json({ result: "fail", err: err });
+    }
   };
 
+  verifyCheck = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const [email, verificationCode] = req.body;
+      console.log(req.body);
 
+      // 숫자를 문자열로 변환하고, 6자리 미만일 경우 앞을 0으로 채웁니다.
+      const verificationCode = String(Math.floor(Math.random() * 1000000)).padStart(6, "0");
+      const expiresAt = moment_tz().toDate();
+
+      //인증 번호를 만들었으면 DB에 저장 (단 유효기간 3분 TTL)
+      await this.userService.createEmailVerification(req.body.email, verificationCode, expiresAt);
+
+      //이메일 발송
+      this.emailService.sendVerificationEmail(email, verificationCode);
+
+      res.json({ result: "success" });
+    } catch (err) {
+      res.json({ result: "fail", err: err });
+    }
+  };
 }
 
 /**

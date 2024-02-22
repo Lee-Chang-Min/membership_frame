@@ -11,10 +11,23 @@ block content
       label.col-sm-3.col-form-label.text-right.font-weight-bold(for='email') 이메일
       .col-sm-4
         input.form-control(type='email', name='email', id='email', placeholder='Email', autofocus, required)
-    // 이메일 인증 버튼
+    // 이메일 인증 버튼 - 클릭 시 사라지게 설정
     .form-group.row.justify-content-md-center
       .col-sm-4.offset-sm-3
-        button.btn.btn-info(type='button', style='width: 100%;') 이메일 인증하기
+        button.btn.btn-info(type='button', id='verifyEmailButton', style='width: 100%;') 이메일 인증하기
+    // 인증번호 입력란 및 타이머 (초기에 숨김)
+    .form-group.row.justify-content-md-center(style='display: none;' id='verificationSection')
+      .col-sm-4.offset-sm-3
+        .row
+          .col-sm-8
+            input.form-control(type='text', name='verificationCode', id='verificationCode', placeholder='Verification Code', required)
+          .col-sm-4
+            span#timer 03:00
+    // 인증하기 및 재전송하기 버튼 (초기에 숨김)
+    .form-group.row.justify-content-md-center(style='display: none;' id='verificationButtons')
+      .col-sm-4.offset-sm-3
+        button.btn.btn-primary(type='button', id='confirmButton', style='width: 48%; margin-right: 2%;') 인증하기
+        button.btn.btn-warning(type='button', id='resendVerificationButton', style='width: 48%;') 재전송하기
     // 비밀번호 입력란
     .form-group.row.justify-content-md-center
       label.col-sm-3.col-form-label.text-right.font-weight-bold(for='password') 비밀번호
@@ -43,3 +56,26 @@ block content
         button.btn.btn-success(type='submit', style='width: 100%;')
           i.fa.fa-user-plus
           | 회원가입하기
+  //- script.
+  //-   document.getElementById('verifyEmailButton').addEventListener('click', function() {
+  //-     // 인증번호 입력란과 타이머를 표시
+  //-   document.getElementById('verificationCodeInput').style.display = 'flex';
+  //-   document.getElementById('resendVerificationButton').style.display = 'none'; // 재전송 버튼은 숨김
+  //-     let time = 180; // 3분 = 180초
+  //-     const timerElement = document.getElementById('timer');
+  //-     timerElement.textContent = `03:00`;
+
+  //-     const interval = setInterval(function() {
+  //-       time -= 1;
+  //-       const minutes = Math.floor(time / 60);
+  //-       const seconds = time % 60;
+  //-       timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+  //-       if (time <= 0) {
+  //-         clearInterval(interval);
+  //-         document.getElementById('resendVerificationButton').style.display = 'block'; // 재전송 버튼을 활성화
+  //-         timerElement.textContent = `00:00`;
+  //-       }
+  //-     }, 1000);
+  //-   });
+

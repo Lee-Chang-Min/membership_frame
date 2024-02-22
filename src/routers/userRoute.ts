@@ -1,13 +1,12 @@
 import { Router } from "express";
 import UserController from "../controllers/user";
 
-
 /**
-  * @swagger
-  * tags:
-  *   name: Users
-  *   description: login router
-  */
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: login router
+ */
 export default class userRoute {
   public router = Router();
   controller: UserController;
@@ -18,7 +17,6 @@ export default class userRoute {
   }
 
   private initializeRoutes() {
-
     /**
      * @swagger
      * /user/test:
@@ -92,14 +90,15 @@ export default class userRoute {
      */
     this.router.post("/login", this.controller.postLogin);
 
-
     this.router.get("/logout", this.controller.logout);
 
     this.router.get("/signup", this.controller.getSignup);
 
     this.router.post("/signup", this.controller.postSignup);
 
-    this.router.post("/verifyEmail", this.controller.verifyEmail);
+    this.router.post("/verifySend", this.controller.verifySend);
+
+    this.router.post("/verifyCheck", this.controller.verifyCheck);
 
     this.router.get("/completeSignup", this.controller.completeSignup);
   }
