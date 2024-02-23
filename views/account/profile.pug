@@ -8,84 +8,93 @@ block content
   form.form-horizontal(action='/account/profile', method='POST')
     input(type='hidden', name='_csrf', value=_csrf)
     .form-group.row.justify-content-md-center
-      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='email') Email
+      label.col-sm-3.col-form-label.text-right.font-weight-bold 프로필
+      .col-sm-7
+        img(src=user.gravatar(), class='profile', width='100', height='100', alt=((user.profile.name || user.email || user.id)))
+    .form-group.row.justify-content-md-center
+      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='email') 이메일(추후 이메일 변경 버튼 필요)
       .col-sm-7
         input.form-control(type='email', name='email', id='email', value=user.email)
     .form-group.row.justify-content-md-center
-      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='name') Name
+      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='email') 닉네임(추후 닉네임 변경 버튼 필요)
+      .col-sm-7
+        input.form-control(type='nickname', name='nickname', id='nickname', value=user.nickname)
+    .form-group.row.justify-content-md-center
+      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='name') 이름
+      .col-sm-7
+        input.form-control(type='text', name='name', id='name', value=user.profile.name)
+    .form-group.row.justify-content-md-center
+      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='phoneNumber') 전화번호
       .col-sm-7
         input.form-control(type='text', name='name', id='name', value=user.profile.name)
     .form-group.row.justify-content-md-center.align-items-center
-      label.col-sm-3.col-form-label.text-right.font-weight-bold Gender
+      label.col-sm-3.col-form-label.text-right.font-weight-bold 성별
       .col-sm-7
         .form-check.form-check-inline
           input#option-male.form-check-input(type='radio', checked=user.profile.gender==='male', name='gender', value='male', data-toggle='radio')
-          label.form-check-label(for="option-male") Male
+          label.form-check-label(for="option-male") 남성
         .form-check.form-check-inline
           input#option-female.form-check-input(type='radio', checked=user.profile.gender==='female', name='gender', value='female', data-toggle='radio')
-          label.form-check-label(for="option-female") Female
+          label.form-check-label(for="option-female") 여성
         .form-check.form-check-inline
           input#option-other.form-check-input(type='radio', checked=user.profile.gender==='other', name='gender', value='other', data-toggle='radio')
-          label.form-check-label(for="option-other") Other
+          label.form-check-label(for="option-other") 선택하지 않음
     .form-group.row.justify-content-md-center
-      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='location') Location
+      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='location') 주소(배송지)
       .col-sm-7
         input.form-control(type='text', name='location', id='location', value=user.profile.location)
-    .form-group.row.justify-content-md-center
-      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='website') Website
-      .col-sm-7
-        input.form-control(type='text', name='website', id='website', value=user.profile.website)
-    .form-group.row.justify-content-md-center
-      label.col-sm-3.col-form-label.text-right.font-weight-bold Gravatar
-      .col-sm-7
-        img(src=user.gravatar(), class='profile', width='100', height='100', alt=((user.profile.name || user.email || user.id)))
     .form-group.row.justify-content-md-center
       .col-sm-4
         button.btn.btn.btn-primary(type='submit')
           i.fa.fa-pencil
-          | Update Profile
+          | 프로필 변경
+    
 
   .page-header
-    h3 Change Password
+    h3 비밀번호 변경
     hr
 
   form.form-horizontal(action='/account/password', method='POST')
     input(type='hidden', name='_csrf', value=_csrf)
     .form-group.row.justify-content-md-center
-      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='password') New Password
+      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='nowpassword') 현재 비밀번호
       .col-sm-7
-        input.form-control(type='password', name='password', id='password')
+        input.form-control(type='nowpassword', name='nowpassword', id='nowpassword')
     .form-group.row.justify-content-md-center
-      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='confirmPassword') Confirm Password
+      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='newpassword') 새 비밀번호
+      .col-sm-7
+        input.form-control(type='newpassword', name='newpassword', id='newpassword')
+    .form-group.row.justify-content-md-center
+      label.col-sm-3.col-form-label.text-right.font-weight-bold(for='confirmPassword') 새 비밀번호 확인
       .col-sm-7
         input.form-control(type='password', name='confirmPassword', id='confirmPassword')
     .form-group.row.justify-content-md-center
       .col-sm-4
         button.btn.btn-primary(type='submit')
           i.fa.fa-lock
-          | Change Password
+          | 비밀번호 변경
 
   .page-header
-    h3 Delete Account
+    h3 탈퇴하기
     hr
 
   form.form-horizontal(action='/account/delete', method='POST')
     .form-group.row.justify-content-md-center
-      p.offset-sm-3.col-sm-7 You can delete your account, but keep in mind this action is irreversible.
+      p.offset-sm-3.col-sm-7 계정을 삭제할 수 있지만 이 작업은 되돌릴 수 없다는 점에 유의하세요.
       input(type='hidden', name='_csrf', value=_csrf)
       .col-sm-4
         button.btn.btn-danger(type='submit')
           i.fa.fa-trash
-          | Delete my account
+          | 회원 탈퇴 하기
 
-  .page-header
-    h3 Linked Accounts
-    hr
-  .form-horizontal
-    .form-group.row.justify-content-md-center
-      .offset-sm-3.col-sm-7
-        if user.facebook
-          p: a.text-danger(href='/account/unlink/facebook') Unlink your Facebook account
-        else
-          p: a(href='/auth/facebook') Link your Facebook account
+  //- .page-header
+  //-   h3 Linked Accounts
+  //-   hr
+  //- .form-horizontal
+  //-   .form-group.row.justify-content-md-center
+  //-     .offset-sm-3.col-sm-7
+  //-       if user.facebook
+  //-         p: a.text-danger(href='/account/unlink/facebook') Unlink your Facebook account
+  //-       else
+  //-         p: a(href='/auth/facebook') Link your Facebook account
 

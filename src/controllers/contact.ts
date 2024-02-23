@@ -33,6 +33,7 @@ export const postContact = async (req: Request, res: Response) => {
 
     if (!errors.isEmpty()) {
         req.flash("errors", errors.array());
+
         return res.redirect("/contact");
     }
 
@@ -46,6 +47,7 @@ export const postContact = async (req: Request, res: Response) => {
     transporter.sendMail(mailOptions, (err) => {
         if (err) {
             req.flash("errors", { msg: err.message });
+
             return res.redirect("/contact");
         }
         req.flash("success", { msg: "Email has been sent successfully!" });

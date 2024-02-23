@@ -5,7 +5,6 @@ import passport from "passport";
 import { User, UserDocument, AuthToken } from "../models/User";
 import { Request, Response, NextFunction } from "express";
 import { IVerifyOptions } from "passport-local";
-import { WriteError } from "mongodb";
 import { body, check, validationResult } from "express-validator";
 import { CallbackError, MongooseError } from "mongoose";
 import moment_tz from "moment-timezone";
@@ -57,6 +56,7 @@ export default class UserController {
 
     if (!errors.isEmpty()) {
       req.flash("errors", errors.array());
+
       return res.redirect("/user/login");
     }
 
@@ -66,6 +66,7 @@ export default class UserController {
       }
       if (!user) {
         req.flash("errors", { msg: info.message });
+
         return res.redirect("/user/login");
       }
       req.logIn(user, (err) => {
@@ -117,6 +118,7 @@ export default class UserController {
 
     if (!errors.isEmpty()) {
       req.flash("errors", errors.array());
+
       return res.redirect("/signup");
     }
 
@@ -124,6 +126,7 @@ export default class UserController {
       const existingUser = await this.userService.findUser(req.body.email);
       if (existingUser) {
         req.flash("errors", { msg: "Account with that email address already exists." });
+
         return res.redirect("/signup");
       }
 
@@ -166,76 +169,73 @@ export default class UserController {
 
   verifyCheck = async (req: Request, res: Response): Promise<void> => {
     try {
-      const [email, verificationCode] = req.body;
-      console.log(req.body);
+      const email = req.query.email as string;
+      const code = req.query.code as string;
 
-      // 숫자를 문자열로 변환하고, 6자리 미만일 경우 앞을 0으로 채웁니다.
-      const verificationCode = String(Math.floor(Math.random() * 1000000)).padStart(6, "0");
-      const expiresAt = moment_tz().toDate();
-
-      //인증 번호를 만들었으면 DB에 저장 (단 유효기간 3분 TTL)
-      await this.userService.createEmailVerification(req.body.email, verificationCode, expiresAt);
-
-      //이메일 발송
-      this.emailService.sendVerificationEmail(email, verificationCode);
-
-      res.json({ result: "success" });
+      //인증번호 DB 조회
+      const findCodeReult = await this.userService.checkEmailVerification(email, code);
+      if (findCodeReult != null) {
+        res.json({ result: "success", log: "verify check pass" });
+      } else {
+        res.json({ result: "success null", log: "verify check null" });
+      }
     } catch (err) {
       res.json({ result: "fail", err: err });
     }
   };
-}
 
-/**
- * Profile page.
- * @route GET /account
- */
-export const getAccount = (req: Request, res: Response): void => {
-  res.render("account/profile", {
-    title: "Account Management",
-  });
-};
+  /**
+   * Profile page.
+   * @route GET /account
+   */
+  getAccount = (req: Request, res: Response): void => {
+    res.render("account/profile", {
+      title: "Account Management",
+    });
+  };
 
-/**
- * Update profile information.
- * @route POST /account/profile
- */
-export const postUpdateProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  await check("email", "Please enter a valid email address.").isEmail().run(req);
-  await body("email").normalizeEmail({ gmail_remove_dots: false }).run(req);
+  /**
+   * Update profile information.
+   * @route POST /account/profile
+   */
+  postUpdateProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    await check("email", "Please enter a valid email address.").isEmail().run(req);
+    await body("email").normalizeEmail({ gmail_remove_dots: false }).run(req);
 
-  const errors = validationResult(req);
+    const errors = validationResult(req);
 
-  if (!errors.isEmpty()) {
-    req.flash("errors", errors.array());
-    return res.redirect("/account");
-  }
+    if (!errors.isEmpty()) {
+      req.flash("errors", errors.array());
 
-  const user = req.user as UserDocument;
-  User.findById(user.id, (err: MongooseError, user: UserDocument) => {
-    if (err) {
-      return next(err);
+      return res.redirect("/account");
     }
-    user.email = req.body.email || "";
-    user.profile.name = req.body.name || "";
-    user.profile.gender = req.body.gender || "";
-    user.profile.location = req.body.location || "";
-    user.profile.website = req.body.website || "";
-    // user.save((err: WriteError & CallbackError) => {
-    //   if (err) {
-    //     if (err.code === 11000) {
-    //       req.flash("errors", {
-    //         msg: "The email address you have entered is already associated with an account.",
-    //       });
-    //       return res.redirect("/account");
-    //     }
-    //     return next(err);
-    //   }
-    //   req.flash("success", { msg: "Profile information has been updated." });
-    //   res.redirect("/account");
-    // });
-  });
-};
+
+    const user = req.user as UserDocument;
+    const updateData = {
+      email: req.body.email,
+      nickName: req.body.nickName,
+      name: req.body.name,
+      phoneNumber: req.body.phoneNumber,
+      gender: req.body.gender,
+      address: req.body.address,
+    };
+
+    this.userService
+      .updateUserProfile(user.id, updateData)
+      .then((result) => {
+        if (!result.success) {
+          req.flash("errors", { msg: result.message });
+
+          return res.redirect("/account");
+        }
+        req.flash("success", { msg: "Profile information has been updated." });
+        res.redirect("/account");
+      })
+      .catch((err) => {
+        next(err);
+      });
+  };
+}
 
 /**
  * Update current password.
@@ -249,6 +249,7 @@ export const postUpdatePassword = async (req: Request, res: Response, next: Next
 
   if (!errors.isEmpty()) {
     req.flash("errors", errors.array());
+
     return res.redirect("/account");
   }
 
@@ -344,6 +345,7 @@ export const postReset = async (req: Request, res: Response, next: NextFunction)
 
   if (!errors.isEmpty()) {
     req.flash("errors", errors.array());
+
     return res.redirect("back");
   }
 
@@ -428,6 +430,7 @@ export const postForgot = async (req: Request, res: Response, next: NextFunction
 
   if (!errors.isEmpty()) {
     req.flash("errors", errors.array());
+
     return res.redirect("/forgot");
   }
 
@@ -439,16 +442,14 @@ export const postForgot = async (req: Request, res: Response, next: NextFunction
           done(err, token);
         });
       },
-      function setRandomToken(
-        token: AuthToken,
-        done: (err: NativeError | WriteError, token?: AuthToken, user?: UserDocument) => void,
-      ) {
+      function setRandomToken(token: AuthToken, done: (err: NativeError | WriteError, token?: AuthToken, user?: UserDocument) => void) {
         User.findOne({ email: req.body.email }, (err: NativeError, user: any) => {
           if (err) {
             return done(err);
           }
           if (!user) {
             req.flash("errors", { msg: "Account with that email address does not exist." });
+
             return res.redirect("/forgot");
           }
           user.passwordResetToken = token;

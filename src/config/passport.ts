@@ -50,6 +50,7 @@ passport.use(
           if (isMatch) {
             return done(undefined, user);
           }
+
           //비밀번호가 틀렸을 때.
           return done(undefined, false, {
             message: "Invalid email or password.",

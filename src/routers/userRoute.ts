@@ -1,5 +1,6 @@
 import { Router } from "express";
 import UserController from "../controllers/user";
+import * as passportConfig from "../config/passport";
 
 /**
  * @swagger
@@ -98,8 +99,12 @@ export default class userRoute {
 
     this.router.post("/verifySend", this.controller.verifySend);
 
-    this.router.post("/verifyCheck", this.controller.verifyCheck);
+    this.router.get("/verifyCheck", this.controller.verifyCheck);
 
     this.router.get("/completeSignup", this.controller.completeSignup);
+
+    //Account Page
+    this.router.get("/account", passportConfig.isAuthenticated, this.controller.getAccount);
+    this.router.post("/account/profile", passportConfig.isAuthenticated, this.controller.postUpdateProfile);
   }
 }

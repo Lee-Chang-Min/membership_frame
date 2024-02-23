@@ -10,21 +10,48 @@ document.addEventListener("DOMContentLoaded", function () {
     this.style.display = "none"; // 이메일 인증 버튼 숨기기
     verificationSection.style.display = "flex"; // 인증번호 입력란 및 타이머 표시
     verificationButtons.style.display = "flex"; // 인증 및 재전송 버튼 표시
-    startTimer(180, timerElement); // 타이머 시작
-  });
 
-  resendButton.addEventListener("click", function () {
+    const emailElement = document.getElementById("email") as HTMLInputElement;
+    const email = emailElement.value;
     fetch("/user/verifySend", {
       method: "POST", // 또는 서버 설정에 따라 'GET'
       headers: {
         "Content-Type": "application/json",
         // 필요한 경우 CSRF 토큰 등의 추가적인 헤더를 포함
       },
-      // body: JSON.stringify({ 이메일 또는 기타 필요한 데이터 }),
+      body: JSON.stringify({ email: email }),
     })
       .then((response) => response.json()) // 응답을 JSON 형태로 파싱
       .then((data) => {
         if (data.result === "success") {
+          alert("전송에 성공했습니다.");
+          startTimer(180, timerElement); // 타이머 시작
+        } else if (data.result === "fail") {
+          alert("전송에 실패했습니다.");
+          console.log(data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("요청 처리 중 오류가 발생했습니다.");
+      });
+  });
+
+  resendButton.addEventListener("click", function () {
+    const emailElement = document.getElementById("email") as HTMLInputElement;
+    const email = emailElement.value;
+    fetch("/user/verifySend", {
+      method: "POST", // 또는 서버 설정에 따라 'GET'
+      headers: {
+        "Content-Type": "application/json",
+        // 필요한 경우 CSRF 토큰 등의 추가적인 헤더를 포함
+      },
+      body: JSON.stringify({ email: email }),
+    })
+      .then((response) => response.json()) // 응답을 JSON 형태로 파싱
+      .then((data) => {
+        if (data.result === "success") {
+          startTimer(180, timerElement); // 타이머 리셋 및 시작
           alert("전송에 성공했습니다.");
         } else if (data.result === "fail") {
           alert("전송에 실패했습니다.");
@@ -35,8 +62,6 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("Error:", error);
         alert("요청 처리 중 오류가 발생했습니다.");
       });
-
-    startTimer(180, timerElement); // 타이머 리셋 및 시작
   });
 
   function startTimer(duration: any, element: any) {
@@ -58,7 +83,35 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   document.getElementById("confirmButton").addEventListener("click", function () {
-    alert("인증번호가 확인되었습니다.");
+    const emailElement = document.getElementById("email") as HTMLInputElement;
+    const email = emailElement.value;
+
+    const codeElement = document.getElementById("verificationCode") as HTMLInputElement;
+    const code = codeElement.value;
+    let queryParams = `?email=${email}&code=${code}`;
+    fetch("/user/verifyCheck" + queryParams, {
+      method: "GET",
+      // headers: {
+      //   "Content-Type": "application/json",
+      // },
+    })
+      .then((response) => response.json()) // 응답을 JSON 형태로 파싱
+      .then((data) => {
+        if (data.result === "success") {
+          startTimer(0, timerElement); // 타이머 리셋 및 시작
+          alert("인증에 성공했습니다");
+        } else if (data.result === "success null") {
+          startTimer(0, timerElement); // 타이머 리셋 및 시작
+          alert("인증 번호가 잘못되었습니다");
+        } else if (data.result === "fail") {
+          alert("인증에 실패했습니다.");
+          console.log(data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("요청 처리 중 오류가 발생했습니다.");
+      });
   });
 });
 

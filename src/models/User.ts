@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 //typescirpt, "&" 연산자를 이용해 여러 개의 타입 정의를 하나로 합침
 export type UserDocument = mongoose.Document & {
   email: string;
+  nickName: string;
   password: string;
   passwordResetToken: string;
   passwordResetExpires: Date;
@@ -14,9 +15,9 @@ export type UserDocument = mongoose.Document & {
 
   profile: {
     name: string;
+    phoneNumber: string;
     gender: string;
-    location: string;
-    website: string;
+    address: string;
     picture: string;
   };
 
@@ -39,6 +40,7 @@ export interface AuthToken {
 const userSchema = new mongoose.Schema<UserDocument>(
   {
     email: { type: String, unique: true },
+    nickName: { type: String, unique: true },
     password: String,
     passwordResetToken: String,
     passwordResetExpires: Date,
@@ -50,9 +52,9 @@ const userSchema = new mongoose.Schema<UserDocument>(
 
     profile: {
       name: String,
+      phoneNumber: String,
       gender: String,
-      location: String,
-      website: String,
+      address: String,
       picture: String,
     },
   },
@@ -107,6 +109,7 @@ userSchema.methods.gravatar = function (size: number = 200) {
     return `https://gravatar.com/avatar/?s=${size}&d=retro`;
   }
   const md5 = crypto.createHash("md5").update(this.email).digest("hex");
+
   return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`;
 };
 

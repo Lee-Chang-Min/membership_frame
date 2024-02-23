@@ -20,5 +20,8 @@
     ],
     "comma-dangle": ["warn", "always-multiline"],
     "@typescript-eslint/no-unused-vars": "warn",
+    "padding-line-between-statements": ["error", { "blankLine": "always", "prev": "*", "next": "return" }], // return 앞에는 빈줄 강제
+    "no-empty": ["error", { "allowEmptyCatch": false }], // 빈 catch 금지
+    //"function-call-argument-newline": ["error", "never"], // 함수 인자에 줖바꿈 금지
   },
 }

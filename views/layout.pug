@@ -12,11 +12,17 @@ html(lang='')
     link(rel="preconnect" href="https://fonts.gstatic.com" crossorigin)
     link(href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Dongle&family=Gamja+Flower&display=swap" rel="stylesheet")
     style.
+      @font-face {
+        font-family: 'GmarketSansMedium';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+      }
       html {
-        font-size: 20px; /* 기본 font-size를 10px로 설정 */
+        font-size: 15px; /* 기본 font-size를 10px로 설정 */
       }
       h3, h2, h1, body, button, input, textarea, a {
-        font-family: "Dongle", sans-serif;
+        font-family: "GmarketSansMedium", sans-serif;
         font-weight: 400;
         font-style: normal;
       }
@@ -24,7 +30,7 @@ html(lang='')
   body
     include partials/header
 
-    .container.pl-sm-0.pr-sm-0.pl-lg-3.pr-lg-3
+    .container.pl-sm-0.pr-sm-0.pl-lg-3.pr-lg-3(style = "margin-top: 50px" )
       include partials/flash
       block content
 

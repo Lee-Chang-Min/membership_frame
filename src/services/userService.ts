@@ -1,10 +1,11 @@
 import { User, UserDocument } from "../models/User";
-import { EmailVerify } from "../models/EmailVerify";
-import { CallbackError, MongooseError } from "mongoose";
+import { EmailVerify, EmailVerifyDocument } from "../models/EmailVerify";
+import { CallbackError, MongooseError, UpdateWriteOpResult } from "mongoose";
 export default class UserService {
-  findUser = async (email: string): Promise<UserDocument | null> => {
+  findUser = async (email: string): Promise<UserDocument> => {
     try {
       const user = User.findOne({ email });
+
       return user;
     } catch (error) {
       throw error;
@@ -13,18 +14,14 @@ export default class UserService {
   createUser = async (email: string, password: string): Promise<UserDocument> => {
     try {
       const user = new User({ email, password });
-      //console.log(user.save());
+
       return await user.save();
     } catch (error) {
       throw error;
     }
   };
 
-  createEmailVerification = async (
-    email: string,
-    verificationCode: string,
-    expiresAt: Date,
-  ): Promise<void> => {
+  createEmailVerification = async (email: string, verificationCode: string, expiresAt: Date): Promise<void> => {
     try {
       // EmailVerify 컬렉션에 저장
       await EmailVerify.create({
@@ -37,25 +34,65 @@ export default class UserService {
     }
   };
 
-  checkEmailVerification = async (email: string, verificationCode: string): Promise<void> => {
+  checkEmailVerification = async (email: string, verificationCode: string): Promise<EmailVerifyDocument> => {
     try {
       const latestDocument = await EmailVerify.find({
         email,
         verificationCode,
       })
-        .sort({ expiresAt: -1 }) // expiresAt 필드를 기준으로 내림차순 정렬
-        .limit(1) // 결과 중 첫 번째 문서만 선택
-        .exec(); // 쿼리 실행
+        .sort({ expiresAt: -1 })
+        .limit(1)
+        .exec();
 
-      if (latestDocument.length > 0) {
-        const document = latestDocument[0];
-        // document를 사용한 로직 처리
-        console.log(document);
+      return latestDocument[0];
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  updateUserProfile = async (
+    userId: string,
+    updateData: {
+      email: string;
+      nickName: string;
+      name?: string;
+      phoneNumber?: string;
+      gender?: string;
+      address?: string;
+    },
+  ): Promise<{ success: boolean; message: string }> => {
+    try {
+      const result = await User.updateOne<UpdateWriteOpResult>(
+        { _id: userId },
+        {
+          // $set: {
+          //   ...(updateData.email && { email: updateData.email }),
+          //   ...(updateData.nickName && { nickName: updateData.nickName }),
+          //   ...(updateData.name && { "profile.name": updateData.name }),
+          //   ...(updateData.phoneNumber && { "profile.phoneNumber": updateData.phoneNumber }),
+          //   ...(updateData.gender && { "profile.gender": updateData.gender }),
+          //   ...(updateData.address && { "profile.address": updateData.address }),
+          // },
+          $set: {
+            email: updateData.email,
+            nickName: updateData.nickName,
+            "profile.name": updateData.name,
+            "profile.phoneNumber": updateData.phoneNumber,
+            "profile.gender": updateData.gender,
+            "profile.address": updateData.address,
+          },
+        },
+      );
+
+      if (result.modifiedCount > 0) {
+        return { success: true, message: "Profile information has been updated." };
       } else {
-        // 일치하는 문서가 없는 경우의 처리
-        console.log("No document found");
+        return { success: false, message: "No changes were made to your profile." };
       }
     } catch (error) {
+      if (error && error.code === 11000) {
+        throw new Error("The email address you have entered is already associated with an account.");
+      }
       throw error;
     }
   };
