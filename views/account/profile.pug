@@ -10,7 +10,7 @@ block content
     .form-group.row.justify-content-md-center
       label.col-sm-3.col-form-label.text-right.font-weight-bold 프로필
       .col-sm-7
-        img(src=user.gravatar(), class='profile', width='100', height='100', alt=((user.profile.name || user.email || user.id)))
+        //- img(src=user.gravatar(), class='profile', width='100', height='100', alt=((user.profile.name || user.email || user.id)))
     .form-group.row.justify-content-md-center
       label.col-sm-3.col-form-label.text-right.font-weight-bold(for='email') 이메일(추후 이메일 변경 버튼 필요)
       .col-sm-7
@@ -26,7 +26,7 @@ block content
     .form-group.row.justify-content-md-center
       label.col-sm-3.col-form-label.text-right.font-weight-bold(for='phoneNumber') 전화번호
       .col-sm-7
-        input.form-control(type='text', name='name', id='name', value=user.profile.name)
+        input.form-control(type='text', name='phoneNumber', id='phoneNumber', value=user.profile.phoneNumber)
     .form-group.row.justify-content-md-center.align-items-center
       label.col-sm-3.col-form-label.text-right.font-weight-bold 성별
       .col-sm-7
@@ -42,7 +42,7 @@ block content
     .form-group.row.justify-content-md-center
       label.col-sm-3.col-form-label.text-right.font-weight-bold(for='location') 주소(배송지)
       .col-sm-7
-        input.form-control(type='text', name='location', id='location', value=user.profile.location)
+        input.form-control(type='text', name='address', id='address', value=user.profile.address)
     .form-group.row.justify-content-md-center
       .col-sm-4
         button.btn.btn.btn-primary(type='submit')

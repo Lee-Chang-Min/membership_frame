@@ -1,6 +1,6 @@
 import { User, UserDocument } from "../models/User";
 import { EmailVerify, EmailVerifyDocument } from "../models/EmailVerify";
-import { CallbackError, MongooseError, UpdateWriteOpResult } from "mongoose";
+import { CallbackError, MongooseError } from "mongoose";
 export default class UserService {
   findUser = async (email: string): Promise<UserDocument> => {
     try {
@@ -50,49 +50,52 @@ export default class UserService {
     }
   };
 
-  updateUserProfile = async (
-    userId: string,
-    updateData: {
-      email: string;
-      nickName: string;
-      name?: string;
-      phoneNumber?: string;
-      gender?: string;
-      address?: string;
-    },
-  ): Promise<{ success: boolean; message: string }> => {
+  findUserByResetToken = async (token: string): Promise<UserDocument> => {
     try {
-      const result = await User.updateOne<UpdateWriteOpResult>(
-        { _id: userId },
-        {
-          // $set: {
-          //   ...(updateData.email && { email: updateData.email }),
-          //   ...(updateData.nickName && { nickName: updateData.nickName }),
-          //   ...(updateData.name && { "profile.name": updateData.name }),
-          //   ...(updateData.phoneNumber && { "profile.phoneNumber": updateData.phoneNumber }),
-          //   ...(updateData.gender && { "profile.gender": updateData.gender }),
-          //   ...(updateData.address && { "profile.address": updateData.address }),
-          // },
-          $set: {
-            email: updateData.email,
-            nickName: updateData.nickName,
-            "profile.name": updateData.name,
-            "profile.phoneNumber": updateData.phoneNumber,
-            "profile.gender": updateData.gender,
-            "profile.address": updateData.address,
-          },
-        },
-      );
+      const user = await User.findOne({
+        passwordResetToken: token,
+        passwordResetExpires: { $gt: Date.now() },
+      });
 
-      if (result.modifiedCount > 0) {
-        return { success: true, message: "Profile information has been updated." };
-      } else {
-        return { success: false, message: "No changes were made to your profile." };
-      }
+      return user;
     } catch (error) {
-      if (error && error.code === 11000) {
-        throw new Error("The email address you have entered is already associated with an account.");
+      throw error;
+    }
+  };
+
+  updatePasswordToken = async (email: string, token: string): Promise<{ user: any; error: string | null }> => {
+    try {
+      const user = await User.findOne({ email: email });
+      if (!user) {
+        return { user: null, error: "해당 계정은 존재하지 않습니다." };
       }
+
+      user.passwordResetToken = token;
+      user.passwordResetExpires = new Date(Date.now() + 3600000); // 1 hour
+      await user.save();
+
+      return { user, error: null };
+    } catch (error) {
+      return { user: null, error: error.message };
+    }
+  };
+
+  resetPassword = async (token: string, newPassword: string): Promise<UserDocument | null> => {
+    try {
+      const user = await User.findOne({
+        passwordResetToken: token,
+        passwordResetExpires: { $gt: Date.now() },
+      });
+      if (!user) {
+        return null;
+      }
+      user.password = newPassword;
+      user.passwordResetToken = undefined;
+      user.passwordResetExpires = undefined;
+      await user.save();
+
+      return user;
+    } catch (error) {
       throw error;
     }
   };

@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 //typescirpt, "&" 연산자를 이용해 여러 개의 타입 정의를 하나로 합침
 export type UserDocument = mongoose.Document & {
   email: string;
-  nickName: string;
+  nickname: string;
   password: string;
   passwordResetToken: string;
   passwordResetExpires: Date;
@@ -40,7 +40,7 @@ export interface AuthToken {
 const userSchema = new mongoose.Schema<UserDocument>(
   {
     email: { type: String, unique: true },
-    nickName: { type: String, unique: true },
+    nickname: { type: String, unique: true },
     password: String,
     passwordResetToken: String,
     passwordResetExpires: Date,

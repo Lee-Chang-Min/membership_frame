@@ -1,4 +1,6 @@
 import nodemailer from "nodemailer";
+import { User, UserDocument, AuthToken } from "../models/User";
+import { log } from "console";
 
 export default class EmailService {
   private transporter;
@@ -41,6 +43,32 @@ export default class EmailService {
         //res.json({ ok: true, msg: " 메일 전송에 성공하였습니다. ", authNum: number });
         console.log("Email sent: " + info.response);
       }
+    });
+  };
+
+  sendForgotPasswordEmail = async (host: string, token: string, user: UserDocument) => {
+    const mailOptions = {
+      from: "dlckdals224@naver.com",
+      to: user.email,
+      subject: "[A2C] 비밀번호 초기화 안내",
+      html: `
+      <div style="font-family: Arial, 'sans-serif'; color: #333;">
+        <h2 style="color: #007bff;">A2C 비밀번호 재설정 요청</h2>
+        <p>당신의 계정 비밀번호 재설정 요청을 받았기 때문에 이 이메일을 받게 되었습니다.</p>
+        <p>다음 링크를 클릭하거나, 브라우저에 붙여넣어 과정을 완료해 주세요:</p>
+        <a href="http://${host}/user/reset/${token}" style="display: inline-block; background-color: #007bff; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 10px 0;">비밀번호 재설정</a>
+        <p>이 요청을 하지 않으셨다면, 이 이메일을 무시하시고 비밀번호는 변하지 않을 것입니다.</p>
+      </div>`,
+    };
+
+    return new Promise((resolve, reject) => {
+      this.transporter.sendMail(mailOptions, (err, info) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({ msg: `${user.email}로 비밀번호 변경 가능한 이메일이 발송되었습니다.` }); // 성공적으로 이메일을 보냈으면, 해당 메시지를 resolve합니다.
+        }
+      });
     });
   };
 }

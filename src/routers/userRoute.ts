@@ -103,8 +103,10 @@ export default class userRoute {
 
     this.router.get("/completeSignup", this.controller.completeSignup);
 
-    //Account Page
-    this.router.get("/account", passportConfig.isAuthenticated, this.controller.getAccount);
-    this.router.post("/account/profile", passportConfig.isAuthenticated, this.controller.postUpdateProfile);
+    this.router.get("/forgot", this.controller.getForgot);
+    this.router.post("/forgot", this.controller.postForgot);
+
+    this.router.get("/reset/:token", this.controller.getReset);
+    //this.router.post("/reset/:token", this.controller.postReset);
   }
 }

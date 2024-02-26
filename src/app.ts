@@ -10,6 +10,7 @@ import helmet from "helmet";
 import swaggerUi from "swagger-ui-express";
 
 import UserRoute from "./routers/userRoute";
+import AccountRoute from "./routers/accountRoute";
 import TestRoute from "./routers/testRoute";
 
 //secrets keys require
@@ -31,6 +32,7 @@ import swaggerDocument from "./docs/swagger";
 const app = express();
 const testRoute = new TestRoute();
 const userRoute = new UserRoute();
+const accountRoute = new AccountRoute();
 
 // Connect to MongoDB
 const mongoUrl = MONGODB_URI;
@@ -100,12 +102,10 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explore
 
 app.get("/", homeController.index);
 app.use("/user", userRoute.router);
+app.use("/account", accountRoute.router);
+
 app.use("/ttt", testRoute.router);
 
-app.get("/forgot", userController.getForgot);
-app.post("/forgot", userController.postForgot);
-app.get("/reset/:token", userController.getReset);
-app.post("/reset/:token", userController.postReset);
 app.get("/contact", contactController.getContact);
 app.post("/contact", contactController.postContact);
 

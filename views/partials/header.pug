@@ -28,12 +28,11 @@ nav.navbar.navbar-expand-lg.navbar-light.bg-light.fixed-top
               if user.profile.picture
                 img(src=user.profile.picture)
               else
-                img(src=user.gravatar(60))
               span= user.profile.name || user.email || user.id
               i.caret
             ul.dropdown-menu
               li.nav-item
-                a.nav-link(href='/user/account') My Account
+                a.nav-link(href='/account') My Account
               li.dropdown-divider
               li.nav-item
                 a.nav-link(href='/user/logout') Logout
