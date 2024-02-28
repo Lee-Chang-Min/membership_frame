@@ -1,6 +1,5 @@
 import nodemailer from "nodemailer";
 import { User, UserDocument, AuthToken } from "../models/User";
-import { log } from "console";
 
 export default class EmailService {
   private transporter;
@@ -46,7 +45,7 @@ export default class EmailService {
     });
   };
 
-  sendForgotPasswordEmail = async (host: string, token: string, user: UserDocument) => {
+  sendForgotPasswordEmail = async (host: string, token: string, user: UserDocument): Promise<{ msg: string }> => {
     const mailOptions = {
       from: "dlckdals224@naver.com",
       to: user.email,
@@ -67,6 +66,33 @@ export default class EmailService {
           reject(err);
         } else {
           resolve({ msg: `${user.email}로 비밀번호 변경 가능한 이메일이 발송되었습니다.` }); // 성공적으로 이메일을 보냈으면, 해당 메시지를 resolve합니다.
+        }
+      });
+    });
+  };
+
+  resetPasswordEmail = async (user: UserDocument): Promise<{ msg: string }> => {
+    const mailOptions = {
+      from: "dlckdals224@naver.com",
+      to: user.email,
+      subject: "[A2C] 비밀번호 변경 완료 안내",
+      html: `
+        <div style="font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 16px; color: #333;">
+          <h2 style="color: #00466a;">비밀번호 변경 확인</h2>
+          <p>안녕하세요,</p>
+          <p>귀하의 계정 <strong>${user.email}</strong>의 비밀번호가 방금 변경되었음을 확인합니다.</p>
+          <p>이 변경을 요청하지 않았다면, 즉시 지원 팀에 연락해 주시기 바랍니다.</p>
+          <p>감사합니다.</p>
+          <p>A2C팀 드림.</p>
+        </div>`,
+    };
+
+    return new Promise((resolve, reject) => {
+      this.transporter.sendMail(mailOptions, (err, info) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({ msg: "비밀번호 변경이 완료 되었습니다." });
         }
       });
     });

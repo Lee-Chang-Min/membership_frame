@@ -67,4 +67,50 @@ export default class AccountController {
         next(err);
       });
   };
+
+  /**
+   * Update current password.
+   * @route POST /account/password
+   */
+  postUpdatePassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    await check("newpassword", "Password must be at least 4 characters long").isLength({ min: 4 }).run(req);
+    await check("confirmPassword", "Passwords do not match").equals(req.body.newpassword).run(req);
+
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      req.flash("errors", errors.array());
+
+      return res.redirect("/account");
+    }
+
+    const user = req.user as UserDocument;
+    const updateResult = this.accountService.updatePassword(user.id, req.body);
+
+    if (updateResult) {
+      req.flash("success", { msg: "비밀번호 변경이 완료되었습니다." });
+
+      return res.redirect("/account");
+    } else {
+      req.flash("errors", { msg: "현재 비밀번호가 일치 하지 않습니다." });
+
+      return res.redirect("/account");
+    }
+  };
+
+  /**
+   * Delete user account.
+   * @route POST /account/delete
+   */
+  postDeleteAccount = (req: Request, res: Response, next: NextFunction): void => {
+    const user = req.user as UserDocument;
+    // User.remove({ _id: user.id }, (err) => {
+    //   if (err) {
+    //     return next(err);
+    //   }
+    //   req.logout();
+    //   req.flash("info", { msg: "Your account has been deleted." });
+    //   res.redirect("/");
+    // });
+  };
 }

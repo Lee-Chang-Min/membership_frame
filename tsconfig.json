@@ -2,15 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs", // commonjs => Require , es2015, esnext => import
-    "lib": [
-      "es6",
-      "DOM.Iterable",
-      "dom",
-      "ScriptHost",
-      "ES2015",
-      "ES2016",
-      "ES2020"
-    ],
+    "lib": ["es6", "DOM.Iterable", "dom", "ScriptHost", "ES2015", "ES2016", "ES2020"],
     //"allowJs": true,
     "esModuleInterop": true, // import 하나의 여러 모듈을 가져오는 문법 허용
     "resolveJsonModule": true,
@@ -25,21 +17,11 @@
     "rootDir": "src",
     "baseUrl": ".", //paths옵션의 기준 디렉토리
     "paths": {
-      "*": [
-        "node_modules/*",
-        "src/types/*"
-      ]
+      "*": ["node_modules/*", "src/types/*"],
     },
-    "types": [
-      "node"
-    ],
-    "typeRoots": [
-      "./@types",
-      "./node_modules/@types"
-    ]
+    "types": ["node", "jest"],
+    "typeRoots": ["./@types", "./node_modules/@types"],
   },
-  "include": [
-    "src/**/*"
-  ]
+  "include": ["src/**/*", "src/test"],
   //"exclude": ["node_modules"],
 }

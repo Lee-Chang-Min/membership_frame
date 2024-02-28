@@ -1,6 +1,4 @@
-import async from "async";
 import crypto from "crypto";
-import nodemailer from "nodemailer";
 import passport from "passport";
 import { User, UserDocument, AuthToken } from "../models/User";
 import { Request, Response, NextFunction } from "express";
@@ -16,7 +14,6 @@ export default class UserController {
   userService: UserService;
   emailService: EmailService;
 
-  //생성자
   constructor() {
     this.userService = new UserService();
     this.emailService = new EmailService();
@@ -231,9 +228,6 @@ export default class UserController {
     if (req.isAuthenticated()) {
       return res.redirect("/");
     }
-
-    console.log(req.params);
-
     try {
       const user = await this.userService.findUserByResetToken(req.params.token);
       if (!user) {
@@ -244,8 +238,8 @@ export default class UserController {
       res.render("account/reset", {
         title: "Password Reset",
       });
-    } catch (err) {
-      next(err);
+    } catch (error) {
+      next(error);
     }
   };
 
@@ -265,86 +259,25 @@ export default class UserController {
       return res.redirect("back");
     }
 
-    const user = await this.userService.resetPassword(req.params.token, req.body.password);
-    if (!user) {
-      req.flash("errors", { msg: "Password reset token is invalid or has expired." });
+    try {
+      const user = await this.userService.resetPassword(req.params.token, req.body.password);
+      if (!user) {
+        req.flash("errors", { msg: "암호 재설정 토큰이 잘못되었거나 만료되었습니다." });
 
-      return res.redirect("back");
-    }
+        return res.redirect("back");
+      }
 
-    req.logIn(user, async (err) => {
-      if (err) return next(err);
-
-      // Send reset password email
-      const transporter = nodemailer.createTransport({
-        service: "SendGrid",
-        auth: {
-          user: process.env.SENDGRID_USER,
-          pass: process.env.SENDGRID_PASSWORD,
-        },
+      req.logIn(user, async (err) => {
+        if (err) return next(err);
+        const emailSendResult = await this.emailService.resetPasswordEmail(user);
+        req.flash("success", emailSendResult);
+        res.redirect("/");
       });
-
-      const mailOptions = {
-        to: user.email,
-        from: "express-ts@starter.com",
-        subject: "Your password has been changed",
-        text: `Hello,\n\nThis is a confirmation that the password for your account ${user.email} has just been changed.\n`,
-      };
-
-      await transporter.sendMail(mailOptions);
-      req.flash("success", { msg: "Success! Your password has been changed." });
-      res.redirect("/");
-    });
+    } catch (error) {
+      next(error);
+    }
   };
 }
-
-/**
- * Update current password.
- * @route POST /account/password
- */
-export const postUpdatePassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  await check("password", "Password must be at least 4 characters long").isLength({ min: 4 }).run(req);
-  await check("confirmPassword", "Passwords do not match").equals(req.body.password).run(req);
-
-  const errors = validationResult(req);
-
-  if (!errors.isEmpty()) {
-    req.flash("errors", errors.array());
-
-    return res.redirect("/account");
-  }
-
-  const user = req.user as UserDocument;
-  User.findById(user.id, (err: MongooseError, user: UserDocument) => {
-    if (err) {
-      return next(err);
-    }
-    user.password = req.body.password;
-    // user.save((err: WriteError & CallbackError) => {
-    //   if (err) {
-    //     return next(err);
-    //   }
-    //   req.flash("success", { msg: "Password has been changed." });
-    //   res.redirect("/account");
-    // });
-  });
-};
-
-/**
- * Delete user account.
- * @route POST /account/delete
- */
-export const postDeleteAccount = (req: Request, res: Response, next: NextFunction): void => {
-  const user = req.user as UserDocument;
-  // User.remove({ _id: user.id }, (err) => {
-  //   if (err) {
-  //     return next(err);
-  //   }
-  //   req.logout();
-  //   req.flash("info", { msg: "Your account has been deleted." });
-  //   res.redirect("/");
-  // });
-};
 
 /**
  * Unlink OAuth provider.

@@ -1,6 +1,11 @@
 import { User, UserDocument } from "../models/User";
 import { MongooseError, UpdateWriteOpResult } from "mongoose";
 
+interface Ipassword {
+  newpassword: string;
+  nowpassword: string;
+  confirmpassword: string;
+}
 export default class AccountService {
   updateUserProfile = async (
     userId: string,
@@ -37,6 +42,27 @@ export default class AccountService {
       if (error && error.code === 11000) {
         throw new Error("The email address you have entered is already associated with an account.");
       }
+      throw error;
+    }
+  };
+
+  updatePassword = async (userid: string, data: Ipassword): Promise<boolean> => {
+    try {
+      const user = await User.findById(userid);
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      // const isMatch = await user.comparePassword(data.nowpassword(cb));
+      // if (!isMatch) {
+      //   return false;
+      // }
+
+      user.password = data.newpassword;
+      await user.save();
+
+      return true;
+    } catch (error) {
       throw error;
     }
   };

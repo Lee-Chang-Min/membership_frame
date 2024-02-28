@@ -108,9 +108,6 @@ app.use("/ttt", testRoute.router);
 
 app.get("/contact", contactController.getContact);
 app.post("/contact", contactController.postContact);
-
-app.post("/account/password", passportConfig.isAuthenticated, userController.postUpdatePassword);
-app.post("/account/delete", passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get("/account/unlink/:provider", passportConfig.isAuthenticated, userController.getOauthUnlink);
 
 /**
