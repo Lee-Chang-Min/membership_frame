@@ -46,22 +46,27 @@ export default class AccountService {
     }
   };
 
-  updatePassword = async (userid: string, data: Ipassword): Promise<boolean> => {
+  updatePassword = async (userid: string, data: Ipassword) => {
     try {
       const user = await User.findById(userid);
       if (!user) {
         throw new Error("User not found");
       }
 
-      // const isMatch = await user.comparePassword(data.nowpassword(cb));
-      // if (!isMatch) {
-      //   return false;
-      // }
+      user.comparePassword(data.nowpassword, async (err, isMatch) => {
+        if (err) {
+          // 오류 처리
+          throw err;
+        }
+        if (!isMatch) {
+          return false;
+        }
 
-      user.password = data.newpassword;
-      await user.save();
+        user.password = data.newpassword;
+        await user.save();
 
-      return true;
+        return true;
+      });
     } catch (error) {
       throw error;
     }

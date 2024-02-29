@@ -38,7 +38,6 @@ export default class AccountController {
 
       return res.redirect("/account");
     }
-    console.log("requser =>", req.user);
 
     const user = req.user as UserDocument;
     const updateData = {
